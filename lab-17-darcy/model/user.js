@@ -20,7 +20,7 @@ const User = new mongoose.Schema({
 });
 
 User.methods.verifyPassword = function(password) {
-  console.log('inside verifyPassword', password);
+  // console.log('inside verifyPassword', password);
   return bcrypt.compare(password, this.password);
 };
 

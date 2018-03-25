@@ -1,17 +1,21 @@
 'use strict';
 
 const express = require('express');
+const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
+const Text = require('../model/textMessage.js');
 const User = require('../model/user.js');
 const getCreds = require('../lib/authorization.js');
+// const bearerMiddleware = require('../lib/bearer-auth-middleware.js');
 
-router.get('/', (req, res) => {
-  User.find()
+router.get('/text', (req, res) => {
+  Text.find()
     .then(results => {
       res.send(results);
-    });
+    })
+    .catch(err => res.send(err.message));
 });
 
 router.get('/signin', (req, res) => {
@@ -24,12 +28,14 @@ router.get('/signin', (req, res) => {
     .then(user => {
       console.log('**user= ', user);
       user.verifyPassword(password)
-        .then(result => {
-          console.log('result=', result);
-          if (result) {
-            res.sendStatus(200);
+        .then(isValid => {
+          console.log('result=', isValid);
+          if (isValid) {
+            let payload = { userId: user._id };
+            let token = jwt.sign(payload, process.env.SECRET);
+            res.send(token);
           }
-          if (!result) {
+          if (!isValid) {
             res.sendStatus(401);
           }
         })
@@ -37,13 +43,16 @@ router.get('/signin', (req, res) => {
           console.log('inside catch', err);
           res.sendStatus(401);
         });
-    });
+    })
+    .catch((err) => res.send(err.message));
 });
     
-router.post('/signup', express.json(), (req, res) => {
-  User.create(req.body)
-    .then(() => {
-      res.sendStatus(200);
+router.post('/text', express.json(), (req, res) => {
+  Text.create(req.body)
+  console.log('inside post - req.body= ', req.body);
+    .save()
+    .then((text) => {
+      res.send(text);
     })
     .catch(() => res.sendStatus(400));
 });
