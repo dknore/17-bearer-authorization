@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGODB_URI);
 
 const userRouter = require('./route/userRoutes.js');
-const textRouter = require('./route/userRoutes.js');
+const textRouter = require('./route/textRoutes.js');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
